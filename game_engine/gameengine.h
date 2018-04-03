@@ -6,26 +6,16 @@
 #include <QDebug>
 #include <qvector.h>
 #include <QLibrary>
-
-class Player
-{
-public:
-    Player() = default;
-    ~Player() = default;
-    int m_id;
-
-    void process()
-    {
-        qDebug() << "player "<< m_id << " turn";
-    }
-
-};
+#include <QJsonObject>
+#include <QJsonDocument>
 
 class GameEngine : public QQuickItem
 {
     Q_OBJECT
 public:
     explicit GameEngine(QQuickItem *parent = nullptr);
+    int getCurrentCell(QString);
+    QString getTaskInfo(int cellNum);
 
     Q_INVOKABLE void initGame();
     Q_INVOKABLE void doTurn();
@@ -34,7 +24,7 @@ signals:
 
 public slots:
 private :
-        QVector<Player> m_players;
+    QVector<QString> m_players = {"player_test","team2","team3","team4"};
 };
 
 #endif // GAMEENGINE_H

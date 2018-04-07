@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Owner.h"
 #include <iostream>
 #include <limits>
+#include <QString>
 
 namespace hazard {
 

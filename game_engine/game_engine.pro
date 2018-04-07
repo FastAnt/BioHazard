@@ -29,4 +29,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    gameengine.h
+    gameengine.h \
+    auxilary/Cell.h \
+    auxilary/GameField.h \
+    auxilary/Owner.h

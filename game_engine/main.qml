@@ -6,14 +6,13 @@ Window {
     visible: true
     width: 960
     height: 960
-    title: qsTr("Hello World")
     GameEngine
     {
         id: game_engine
     }
     Component.onCompleted:
     {
-        game_engine.initGame();
+        game_engine.initGame( Qt.application.arguments[1] ) ;
         game_engine.doTurn();
     }
     Grid {

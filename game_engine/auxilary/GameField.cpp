@@ -8,17 +8,30 @@
 namespace hazard {
 
 static const QString DB_name("./game_field.sqlite");
+static const int owner_index_in_db = 1;
+static const int score_index_in_db = 2;
+static const int task_index_in_db = 3;
 
 static int myrandom (int i)
 {
     return std::rand()%i;
 }
 
+
 GameField::GameField()
     :m_field_DB(QSqlDatabase::addDatabase( "QSQLITE" ))
     ,m_qry(m_field_DB)
 {
+}
 
+void GameField::change_cell(int x, int y, const QString& owner, double score)
+{
+    assert (x < WIDTH && y < HEIGHT && "cell out of field");
+
+    Cell* cur_cell = get_cell(x, y);
+    cur_cell->m_owner = owner;
+    cur_cell->m_best_score = score;
+    assert(save_cell_to_db(x, y, owner, score) && "cannot afford not saving cell - fall");
 }
 
 Cell* GameField::get_cell_for_turn(QString player_name)
@@ -122,16 +135,16 @@ QString GameField::get_owner_of_cell(int x, int y)
     }
 }
 
-uint32_t GameField::get_score(int x, int y)
+double GameField::get_score(int x, int y)
 {
     auto cell = get_cell(x,y);
     if(cell)
     {
-        return cell->best_score;
+        return cell->m_best_score;
     }
     else
     {
-        return  std::numeric_limits< uint32_t >::max( );
+        return -1;
     }
 }
 
@@ -140,7 +153,7 @@ QString GameField::get_task_id(int x, int y)
     auto cell = get_cell(x,y);
     if(cell)
     {
-        return cell->task_ID;
+        return cell->m_task_ID;
     }
     else
     {
@@ -148,9 +161,31 @@ QString GameField::get_task_id(int x, int y)
     }
 }
 
-void GameField::save()
+bool GameField::save_cell_to_db(int x, int y, const QString& owner, double score)
 {
+    int pos_in_db = WIDTH*y + x + 1; // db cellNumber starts from 1
+    m_qry.prepare(
+                QString("UPDATE single_table SET owner='%1', score=%2"
+                        " WHERE cellNumber=%3").arg(owner).arg(score).arg(pos_in_db)
+                );
+    if(!m_qry.exec())
+    {
+        qDebug()<<"could not update cell!!!";
+        qDebug()<< m_qry.lastError().text();
+        return false;
+    }
+    return true;
+}
 
+void GameField::save_all()
+{
+    for(int x = 0 ; x < WIDTH; x++)
+    {
+        for(int y = 0 ; y < HEIGHT; y++)
+        {
+            save_cell_to_db(x, y, get_owner_of_cell(x, y), get_score(x,y));
+        }
+    }
 }
 
 void GameField::load()
@@ -169,10 +204,14 @@ void GameField::load()
     // size is already verified
     for (int current_cell_ind = 0; m_qry.next(); ++current_cell_ind)
     {
-        Cell* cur_cell = get_cell(current_cell_ind%WIDTH, current_cell_ind/WIDTH);
-        cur_cell->m_owner = QString( m_qry.value(1).toString() );
-        cur_cell->best_score = m_qry.value(2).toInt();
-        cur_cell->task_ID = QString(m_qry.value(3).toString());
+        int x = current_cell_ind % WIDTH;
+        int y =  current_cell_ind / WIDTH;
+        Cell* cur_cell = get_cell(x,y);
+        cur_cell->m_owner = QString( m_qry.value(owner_index_in_db).toString() );
+        cur_cell->m_best_score = m_qry.value(score_index_in_db).toDouble();
+        cur_cell->m_task_ID = QString(m_qry.value(task_index_in_db).toString());
+        cur_cell->m_x = x;
+        cur_cell->m_y = y;
     }
 }
 
@@ -211,7 +250,7 @@ bool GameField::create_dummy_db_table()
                   "("
                   "cellNumber INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, "
                   "owner TEXT DEFAULT 'no_team', "
-                  "score INTEGER NOT NULL DEFAULT -1, "
+                  "score REAL NOT NULL DEFAULT -1, "
                   "task TEXT NOT NULL DEFAULT '1' "
                   ");");
     if (!m_qry.exec())
@@ -223,7 +262,7 @@ bool GameField::create_dummy_db_table()
     QString dummy_task("1");        // TODO -- put some thought into default task_ID
     for (int i = 0; i < WIDTH*HEIGHT; ++i)
     {
-        m_qry.prepare("insert into single_table (task) values('"+dummy_task+"')");
+        m_qry.prepare("INSERT INTO single_table (task) VALUES('"+dummy_task+"')");
         if(!m_qry.exec())
         {
             qDebug()<< m_qry.lastError().text();
@@ -235,25 +274,16 @@ bool GameField::create_dummy_db_table()
 
 bool GameField::verify_db_size()
 {
-    m_qry.clear();
     m_qry.prepare("SELECT COUNT(cellNumber) FROM single_table;");
     if(!m_qry.exec())
     {
-        qDebug("cannot count number of elements in table, try creating a new dummy one");
-        if (!create_dummy_db_table())
-        {
-            return false;
-        }
+        qDebug("cannot count number of elements in table");
+        assert(false);
     }
 
-    m_qry.first(); // yeah, this must be done
+    m_qry.next(); // yeah, this must be done
     int DB_quantity = m_qry.value(0).toInt();
     qDebug()<<"db has " << DB_quantity << "cells";
-    if (DB_quantity == 0)
-    {
-        qDebug()<<"creating dummy DB because current one is empty";
-        create_dummy_db_table();
-    }
 
     assert(DB_quantity == WIDTH*HEIGHT && "corrupt DB - shall we create a dummy?" );
 

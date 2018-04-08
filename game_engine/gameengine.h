@@ -19,7 +19,7 @@ public:
     int getCurrentCell(QString);
     std::pair<QString,QString> getTaskInfo(QString id);
 
-    Q_INVOKABLE void initGame();
+    Q_INVOKABLE void initGame(QString argv);
     Q_INVOKABLE void doTurn();
 
 signals:

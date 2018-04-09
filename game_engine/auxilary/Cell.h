@@ -1,16 +1,17 @@
 #pragma once
 
-#include "Owner.h"
 #include <iostream>
-#include <limits>
+#include <QString>
 
 namespace hazard {
 
 struct Cell
 {
     QString m_owner;
-    uint32_t best_score = std::numeric_limits< uint32_t >::max( );
-    QString task_ID = "";
+    uint32_t m_best_score = -1;
+    QString m_task_ID;
+    int m_x = -1;
+    int m_y = -1;
 };
 
 }  // hazard

@@ -34,16 +34,23 @@ void GameField::change_cell(int x, int y, const QString& owner, double score)
     assert(save_cell_to_db(x, y, owner, score) && "cannot afford not saving cell - fall");
 }
 
+void get_valid_cord()
+{
+
+}
 Cell* GameField::get_cell_for_turn(QString player_name)
 {
     std::map<Cell*, std::pair<int, int>> owner_cells;
+    std::vector<std::pair<int, int>> owner_cells_;
     for(int x = 0 ; x < WIDTH; x++)
     {
         for(int y = 0 ; y < HEIGHT; y++)
         {
-            if(cellArray[x][y].m_owner == player_name)
+            qDebug() << get_cell(x,y)->m_owner;
+            if(get_cell(x,y)->m_owner == player_name)
             {
                 owner_cells[&(cellArray[x][y])] = std::make_pair(x,y);
+                owner_cells_.push_back(std::make_pair(x,y));
             }
         }
     }
@@ -52,7 +59,13 @@ Cell* GameField::get_cell_for_turn(QString player_name)
     {
         return nullptr; // player has no cells
     }
-    for (auto& owner_cell : owner_cells)
+
+    std::random_shuffle ( owner_cells_.begin(), owner_cells_.end() );
+    std::random_shuffle ( owner_cells_.begin(), owner_cells_.end(), myrandom);
+
+
+
+    for (auto& owner_cell : owner_cells_)
     {
         enum pos
         {
@@ -79,14 +92,14 @@ Cell* GameField::get_cell_for_turn(QString player_name)
         // !!! possible to use just vector of neighbors, but purpose that random_shuffle doesnt correct work with pairs,
         // or random sort fust depend on first arg
         std::map<int,std::pair<int, int>> neighbors  {
-            {left        ,{owner_cell.second.first-1, owner_cell.second.second   }}, //  left
-            {top_left    ,{owner_cell.second.first-1, owner_cell.second.second-1 }}, // top left
-            {top         ,{owner_cell.second.first, owner_cell.second.second-1   }}, // top
-            {top_right   ,{owner_cell.second.first+1, owner_cell.second.second-1 }}, // top right
-            {right       ,{owner_cell.second.first+1, owner_cell.second.second   }}, // right
-            {right_bottom,{owner_cell.second.first+1, owner_cell.second.second+1 }}, // right bottom
-            {bottom      ,{owner_cell.second.first, owner_cell.second.second+1   }}, // bottom
-            {bottom_left ,{owner_cell.second.first -1, owner_cell.second.second+1}} //  bottom left
+            {left        ,{owner_cell.first-1, owner_cell.second   }}, //  left
+            {top_left    ,{owner_cell.first-1, owner_cell.second-1 }}, // top left
+            {top         ,{owner_cell.first, owner_cell.second-1   }}, // top
+            {top_right   ,{owner_cell.first+1, owner_cell.second-1 }}, // top right
+            {right       ,{owner_cell.first+1, owner_cell.second   }}, // right
+            {right_bottom,{owner_cell.first+1, owner_cell.second+1 }}, // right bottom
+            {bottom      ,{owner_cell.first, owner_cell.second+1   }}, // bottom
+            {bottom_left ,{owner_cell.first -1, owner_cell.second+1}} //  bottom left
         };
 
 
@@ -113,7 +126,14 @@ Cell* GameField::get_cell(int x, int y)
 {
     if( x < WIDTH && y < HEIGHT)
     {
-        return &cellArray[x][y];
+        if( x >=0 && y >= 0)
+        {
+            return &cellArray[x][y];
+        }else
+        {
+            return nullptr;
+        }
+
     }
     else
     {

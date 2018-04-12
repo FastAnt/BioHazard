@@ -21,7 +21,7 @@ public:
     int getCurrentCell(QString);
     std::pair<QString,QString> getTaskInfo(QString id);
 
-    Q_INVOKABLE void initGame(/*QString argv*/);
+    Q_INVOKABLE void initGame(QString argv);
     Q_INVOKABLE void doTurn();
     Q_INVOKABLE QString get_cell_color(int idx);
     Q_INVOKABLE QString get_cell_task_id(int idx);

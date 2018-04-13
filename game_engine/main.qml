@@ -3,9 +3,11 @@ import QtQuick.Window 2.2
 import lux.study.GameEngine 1.0
 
 Window {
+    id : root
     visible: true
-    width: 960
-    height: 1100
+    width: 1
+    height: 1
+
 
     Item
     {
@@ -17,6 +19,7 @@ Window {
             height: 1100
             Component.onCompleted:
             {
+
                 game_engine.initGame( Qt.application.arguments[1] ) ;
                 loader.sourceComponent = src;
                 game_engine.doTurn();

@@ -2,6 +2,7 @@
 #include "auxilary/Cell.h"
 #include <time.h>
 #include <math.h>       /* pow */
+#include <chrono>
 
 GameEngine::GameEngine(QQuickItem *parent) : QQuickItem(parent)
 {
@@ -53,7 +54,7 @@ void GameEngine::doTurn()
 {
     for(auto playerName : m_players)
     {
-        QLibrary myLib("./"+playerName);
+        QLibrary myLib("./"+playerName+"/"+playerName);
         myLib.load();
         typedef std::string (*processMethod)(std::string,std::string);
         if(myLib.isLoaded())
@@ -67,20 +68,27 @@ void GameEngine::doTurn()
                     {
                         std::pair<QString,QString> task_arg = getTaskInfo(p_cell_for_turn->m_task_ID);
 
-                        auto start = clock();
-                        auto res = run(p_cell_for_turn->m_task_ID.toStdString(),task_arg.first.toStdString());
-                        auto stop = clock();
+                        //auto start = clock();
+                        std::string res;
+                        auto start = std::chrono::system_clock::now();
+                        for(int i = 0; i < 100; i++)
+                        {
+                            res = run(p_cell_for_turn->m_task_ID.toStdString(),task_arg.first.toStdString());
+                        }
+                        auto end = std::chrono::system_clock::now();
+                        //auto stop = clock();
                         // hope that's enough precision
-                        double new_time_score = (double)(stop - start) / CLOCKS_PER_SEC;
+                        std::chrono::duration<double,std::micro> new_time_score = end-start;
+                        //double new_micro_seconds = std::chrono::duration_cast<std::chrono::microseconds>(new_time_score.count());
 
                         if(task_arg.second == QString(res.c_str()))
                         {
                             int x = p_cell_for_turn->m_x;
                             int y = p_cell_for_turn->m_y;
                             double old_time_score = m_field.get_score(x, y);
-                            if (old_time_score == -1 || new_time_score < old_time_score)
+                            if (old_time_score == -1 || new_time_score.count() < old_time_score)
                             {
-                                m_field.change_cell(x, y, playerName, new_time_score );
+                                m_field.change_cell(x, y, playerName, new_time_score.count() );
                             }
                         }
                     }
@@ -136,7 +144,7 @@ void GameEngine::dump_result()
 {
     QImage dumped(std::move(m_result->image()));
     dumped.save("./field.png");
-    exit(0);
+    qApp->exit();
 }
 
 std::pair<int, int> GameEngine::get_coordinate_from_id(int id)

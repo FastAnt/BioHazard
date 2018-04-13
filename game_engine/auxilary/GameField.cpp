@@ -14,6 +14,7 @@ static const int task_index_in_db = 3;
 
 static int myrandom (int i)
 {
+    std::srand(std::time(0));
     return std::rand()%i;
 }
 

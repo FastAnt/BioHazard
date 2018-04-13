@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GameClient</title>
+
+    <meta charset=utf-8 name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript" src="qwebchannel.js"></script>
+    <script type="text/javascript">
+        var wsUri = "ws://172.27.170.118:3227";
+
+        window.onload = function() {
+            var socket = new WebSocket(wsUri);
+
+            socket.onclose = function() {
+                console.error("web channel closed");
+            };
+            socket.onerror = function(error) {
+                console.error("web channel error: " + error);
+            };
+            socket.onopen = function() {
+                window.channel = new QWebChannel(socket, function(channel) {
+                var func = function() {
+                    image = document.getElementById("message");
+                    image.src = channel.objects.gameServer.message;
+                }
+                    func();
+                    channel.objects.gameServer.messageChanged.connect(func);
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+<img id="message"></img>
+</body>
+</html>

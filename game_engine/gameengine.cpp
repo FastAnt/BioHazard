@@ -4,6 +4,9 @@
 #include <math.h>       /* pow */
 #include <chrono>
 
+#include "../shared/biohazard_adaptor.h"
+#include "../shared/biohazard_interface.h"
+
 GameEngine::GameEngine(QQuickItem *parent) : QQuickItem(parent)
 {
 
@@ -138,8 +141,25 @@ QString GameEngine::get_cell_task_id(int idx)
 
 void GameEngine::dump_result()
 {
-    QImage dumped(std::move(m_result->image()));
+    QImage dumped(m_result->image());
     dumped.save("./field.png");
+
+    QByteArray array;
+    QBuffer buffer(&array);
+    buffer.open(QIODevice::WriteOnly);
+    dumped.save(&buffer, "PNG");
+    buffer.close();
+
+    QString message = array.toBase64();
+
+    new MessageAdaptor(this);
+    QDBusConnection::sessionBus().registerObject("/", this);
+    new org::biohazard::message(QString(), QString(), QDBusConnection::sessionBus(), this);
+
+    QDBusMessage msg = QDBusMessage::createSignal("/", "org.biohazard.message", "message");
+    msg << message;
+    QDBusConnection::sessionBus().send(msg);
+
     qApp->exit();
 }
 

@@ -42,11 +42,11 @@ std::pair<QString, QString> GameEngine::getTaskInfo( QString id )
 
 void GameEngine::initGame( QString argv )
 {
-        if (argv == "create")
-        {
-            m_field.create_dummy_db_table();
-        }
-    // load player names
+//        if (argv == "create")
+//        {
+//            m_field.create_dummy_db_table();
+//        }
+//    // load player names
     m_field.load();
 }
 
@@ -76,11 +76,7 @@ void GameEngine::doTurn()
                             res = run(p_cell_for_turn->m_task_ID.toStdString(),task_arg.first.toStdString());
                         }
                         auto end = std::chrono::system_clock::now();
-                        //auto stop = clock();
-                        // hope that's enough precision
                         std::chrono::duration<double,std::micro> new_time_score = end-start;
-                        //double new_micro_seconds = std::chrono::duration_cast<std::chrono::microseconds>(new_time_score.count());
-
                         if(task_arg.second == QString(res.c_str()))
                         {
                             int x = p_cell_for_turn->m_x;

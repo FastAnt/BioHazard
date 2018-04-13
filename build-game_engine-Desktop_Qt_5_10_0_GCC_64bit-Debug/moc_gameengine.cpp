@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_GameEngine_t {
-    QByteArrayData data[8];
-    char stringdata0[76];
+    QByteArrayData data[9];
+    char stringdata0[81];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,13 +35,14 @@ QT_MOC_LITERAL(0, 0, 10), // "GameEngine"
 QT_MOC_LITERAL(1, 11, 11), // "dump_result"
 QT_MOC_LITERAL(2, 23, 0), // ""
 QT_MOC_LITERAL(3, 24, 8), // "initGame"
-QT_MOC_LITERAL(4, 33, 6), // "doTurn"
-QT_MOC_LITERAL(5, 40, 14), // "get_cell_color"
-QT_MOC_LITERAL(6, 55, 3), // "idx"
-QT_MOC_LITERAL(7, 59, 16) // "get_cell_task_id"
+QT_MOC_LITERAL(4, 33, 4), // "argv"
+QT_MOC_LITERAL(5, 38, 6), // "doTurn"
+QT_MOC_LITERAL(6, 45, 14), // "get_cell_color"
+QT_MOC_LITERAL(7, 60, 3), // "idx"
+QT_MOC_LITERAL(8, 64, 16) // "get_cell_task_id"
 
     },
-    "GameEngine\0dump_result\0\0initGame\0"
+    "GameEngine\0dump_result\0\0initGame\0argv\0"
     "doTurn\0get_cell_color\0idx\0get_cell_task_id"
 };
 #undef QT_MOC_LITERAL
@@ -63,19 +64,19 @@ static const uint qt_meta_data_GameEngine[] = {
        1,    0,   39,    2, 0x0a /* Public */,
 
  // methods: name, argc, parameters, tag, flags
-       3,    0,   40,    2, 0x02 /* Public */,
-       4,    0,   41,    2, 0x02 /* Public */,
-       5,    1,   42,    2, 0x02 /* Public */,
-       7,    1,   45,    2, 0x02 /* Public */,
+       3,    1,   40,    2, 0x02 /* Public */,
+       5,    0,   43,    2, 0x02 /* Public */,
+       6,    1,   44,    2, 0x02 /* Public */,
+       8,    1,   47,    2, 0x02 /* Public */,
 
  // slots: parameters
     QMetaType::Void,
 
  // methods: parameters
+    QMetaType::Void, QMetaType::QString,    4,
     QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::QString, QMetaType::Int,    6,
-    QMetaType::QString, QMetaType::Int,    6,
+    QMetaType::QString, QMetaType::Int,    7,
+    QMetaType::QString, QMetaType::Int,    7,
 
        0        // eod
 };
@@ -87,7 +88,7 @@ void GameEngine::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->dump_result(); break;
-        case 1: _t->initGame(); break;
+        case 1: _t->initGame((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 2: _t->doTurn(); break;
         case 3: { QString _r = _t->get_cell_color((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;

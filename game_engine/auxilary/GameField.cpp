@@ -4,6 +4,7 @@
 #include <cstdlib>      // std::rand, std::srand
 #include <assert.h>
 #include <QFile>
+#include <ctime>
 
 namespace hazard {
 
@@ -279,10 +280,12 @@ bool GameField::create_dummy_db_table()
         qDebug()<<"FAILED TO CREATE DB";
         return false;
     }
+    std::srand(std::time(nullptr));
 
-    QString dummy_task("1");        // TODO -- put some thought into default task_ID
     for (int i = 0; i < WIDTH*HEIGHT; ++i)
     {
+        int rand_task = 1 + std::rand()/((RAND_MAX + 1u)/20);
+        QString dummy_task(QString::number(rand_task));        // TODO -- put some thought into default task_ID
         m_qry.prepare("INSERT INTO single_table (task) VALUES('"+dummy_task+"')");
         if(!m_qry.exec())
         {

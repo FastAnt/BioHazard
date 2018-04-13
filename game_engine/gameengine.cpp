@@ -40,12 +40,12 @@ std::pair<QString, QString> GameEngine::getTaskInfo( QString id )
     return std::make_pair(arg,res);
 }
 
-void GameEngine::initGame( /*QString argv*/ )
+void GameEngine::initGame( QString argv )
 {
-    //    if (argv == "create")
-    //    {
-    //        m_field.create_dummy_db_table();
-    //    }
+        if (argv == "create")
+        {
+            m_field.create_dummy_db_table();
+        }
     // load player names
     m_field.load();
 }
